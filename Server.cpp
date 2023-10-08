@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "User.hpp"
 
 Server::Server(int port, int maxClient, int maxBufferSize) : serverSocket(-1), PORT(port), MAX_CLIENTS(maxClient), MAX_BUFFER_SIZE(maxBufferSize)
 {
@@ -23,6 +24,8 @@ bool	Server::start()
 		perror("Error !\nListen failed !\n");
 		return (false);
 	}
+	if (!setHostname())
+		return (false);
 	std::cout << *this << std::endl;
 	return (true);
 }
@@ -46,9 +49,12 @@ void	Server::run()
 			acceptClient(fds);
 		}
 		for (int i = 1; i < MAX_CLIENTS; i++) {
-			if (fds[i].fd != -1 && (fds[i].revents & (POLLIN | POLLHUP)))
-			{
+			if (fds[i].fd != -1 && (fds[i].revents == POLLIN))
 				handleClient(fds, i);
+			else if (fds[i].fd != -1 && (fds[i].revents == POLLHUP )) {
+				//will create close process here
+				close(fds[i].fd);
+				fds[i].fd = -1;
 			}
 		}
 	}
@@ -56,15 +62,22 @@ void	Server::run()
 
 void	Server::acceptClient(struct pollfd fds[])
 {
-	int	newClient = accept(serverSocket, 0, 0);
+	int					rtn;
+	struct sockaddr_in	clientAddress;
+
+	int	newClient = accept(serverSocket, reinterpret_cast<sockaddr*>(&clientAddress), reinterpret_cast<socklen_t*>(&clientAddress));
 	if (newClient == -1) {
 		perror("Error !\n Accept failed !\n");
 		return ;
 	}
 	for (int i = 1; i < MAX_CLIENTS; i++) {
 		if (fds[i].fd == -1) {
+			if (fcntl(newClient, F_SETFL, O_NONBLOCK) == -1)
+				perror("Error !\nFcntl didn't work as excepted!\n");
 			fds[i].fd = newClient;
 			fds[i].events = POLLIN;
+			this->userList.push_back(new User(fds[i].fd));
+			this->sender(fds[i].fd, "Bilo'nun IRC Serverina hosgeldin !");
 			break ;
 		}
 	}
@@ -75,20 +88,27 @@ void	Server::handleClient(struct pollfd fds[], int index)
 {
 	int clientSocket = fds[index].fd;
 	char buffer[MAX_BUFFER_SIZE];
-	memset(buffer, 0, sizeof(buffer));
+	Execute exec;
 
+	memset(buffer, 0, sizeof(buffer));
 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 	if (bytesRead <= 0) {
-		close(clientSocket);
-		fds[index].fd = -1;
+		perror("Error !\nrecv didn't work as excepted!\n");
 	}
 	else {
-		for (int i = 0; i < MAX_CLIENTS; i++) {
-			if (fds[i].fd != -1 && (fds[i].fd != clientSocket)) {
-				send(fds[i].fd, buffer, strlen(buffer), 0);
-			}
-		}
+		User *user = this->findUser(fds[index].fd);
+		std::string msg(buffer);
+		if (user->isAuth() == false) // I will complete this condition later.
+			std::cout << "Bro kimliğini doğrulamadın !\n" << std::endl;
+		else
+			exec.execute(fds[index].fd, this, msg);
 	}
+}
+
+void	Server::sender(int &fd, std::string message)
+{
+	std::string buffer = message + "\r\n";
+	send(fd, buffer.c_str(), buffer.length(), 0);
 }
 
 int	Server::getPort() const
@@ -99,4 +119,34 @@ int	Server::getPort() const
 std::ostream &operator<<(std::ostream &o, const Server &s) {
 	o << "Server port : " << s.getPort();
 	return (o);
+}
+
+User	*Server::findUser(int fd)
+{
+	for (int i = 0; i < userList.size(); i++) {
+		if (userList[i]->getUserFd() == fd)
+			return (userList[i]);
+	}
+	return (NULL);
+}
+
+std::string Server::getPassword() const
+{
+	return (this->password);
+}
+
+std::string Server::getHostname() const
+{
+	return (this->hostname);
+}
+
+bool	Server::setHostname()
+{
+	char hName[1024];
+	if (gethostname(hName, 1024) == -1) {
+		perror("Error !\nHostname couldn't be set !\n");
+		return (false);
+	}
+	this->hostname = hName;
+	return (true);
 }

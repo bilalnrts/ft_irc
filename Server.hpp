@@ -6,15 +6,25 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include "User.hpp"
+#include "Channel.hpp"
 
+class User;
+class Channel;
 class Server
 {
 	private :
-		int					serverSocket;
-		struct sockaddr_in	serverAddr;
-		int					PORT;
-		int					MAX_CLIENTS;
-		int					MAX_BUFFER_SIZE;
+		int						serverSocket;							//Server socket fd && Values are assigned in the start() function
+		struct sockaddr_in		serverAddr;								//Keeps port and protocol information && Values are assigned during creation (constructor)
+		int						PORT;									//Listened port number && Values are assigned during creation (constructor)
+		int						MAX_CLIENTS;							//Max number of users that can connect && Values are assigned during creation (constructor)
+		int						MAX_BUFFER_SIZE;
+		std::vector<User*>		userList;								//List of connected users
+		std::vector<Channel*>	channelList;							//List of created channels
+		std::string				password;								//Server password && has get methods && Values are assigned during creation (constructor)
+		std::string				hostname;								//Hostname (will create later) has get set methods
+		std::string				createdTime;							//Server creation time
 		void				acceptClient(struct pollfd fds[]);
 		void				handleClient(struct pollfd fds[], int index);
 
@@ -23,6 +33,11 @@ class Server
 		int		getPort() const;
 		bool	start();
 		void	run();
+		void	sender(int &fd, std::string message);
+		User				*findUser(int fd);
+		std::string			getPassword() const;
+		std::string			getHostname() const;
+		bool				setHostname();
 };
 
 std::ostream &operator<<(std::ostream &o, const Server &s);
