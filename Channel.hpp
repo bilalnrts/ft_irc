@@ -3,7 +3,7 @@
 
 #include "User.hpp"
 #include "Server.hpp"
-#include "utils.hpp"
+#include "Utils.hpp"
 #include <iostream>
 #include <vector>
 

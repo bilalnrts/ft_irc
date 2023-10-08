@@ -80,7 +80,7 @@ void Channel::changeOwner(Server *server)
 	else
 	{
 		User *newOwner;
-		srand(time(NULL));
+		srand(time(0));
 		while (true)
 		{
 			int randomIndex = rand() % this->userList.size();
@@ -89,10 +89,11 @@ void Channel::changeOwner(Server *server)
 		}
 		this->owner = newOwner;
 		this->addEditor(this->owner);
-		for (User *user : this->userList) {
-			int toSend = user->getUserFd();
-			server->sender(toSend, utils::getPrefix(user) + " MODE " + this->name + " +o " + this->owner->getNickname());
-		} // set the user getters
+		for (std::vector<User *>::iterator it = this->userList.begin(); it != this->userList.end(); ++it)
+		{
+			int toSend = (*it)->getUserFd();
+			server->sender(toSend, utils::getPrefix(*it) + " MODE " + this->name + " +o " + this->owner->getNickname());
+		}
 	}
 }
 
