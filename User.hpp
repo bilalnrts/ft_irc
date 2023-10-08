@@ -13,6 +13,7 @@ class User
 		bool		auth;
 		Auth		auths[3];
 		std::string	username;
+		std::string	realname;
 		std::string	nickname;
 		std::string	hostname;
 
@@ -25,6 +26,9 @@ class User
 		std::string	getNickname() const;
 		std::string	getUsername() const;
 		std::string	getHostname() const;
+		void		setNickname(std::string nickname);
+		void		setRealname(std::string realname);
+		void		setUsername(std::string username);
 };
 
 #endif

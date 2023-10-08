@@ -22,5 +22,13 @@ void	User::setAuths(std::string command, bool x)
 }
 
 std::string User::getNickname() const {return (this->nickname);}
+
 std::string User::getUsername() const {return (this->username);}
+
 std::string User::getHostname() const {return (this->hostname);}
+
+void	User::setNickname(std::string nickname) {this->nickname = nickname;}
+
+void	User::setUsername(std::string username) {this->username = username;}
+
+void	User::setRealname(std::string realname) {this->realname = realname;}
