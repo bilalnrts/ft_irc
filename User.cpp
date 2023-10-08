@@ -1,6 +1,6 @@
 #include "User.hpp"
 
-User::User(int fd): fd(fd), auth(false)
+User::User(int fd): fd(fd), auth(true) //auth will be false later
 {
 	this->auths[0] = Auth("NICK", false);
 	this->auths[1] = Auth("PASS", false);

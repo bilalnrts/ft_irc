@@ -2,6 +2,7 @@
 #define USER_HPP
 
 #include "Server.hpp"
+#include "Execute.hpp"
 
 typedef std::pair<std::string, bool> Auth;
 
