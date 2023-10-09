@@ -6,6 +6,7 @@ namespace utils
 	{
 		return (":" + user->getNickname() + "!" + user->getUsername() + "@" + user->getHostname());
 	}
+
 	std::vector<std::string>	split(std::string msg, std::string chars)
 	{
 		std::vector<std::string>	spl;
@@ -20,5 +21,12 @@ namespace utils
 		}
 		spl.push_back(msg);
 		return (spl);
+	}
+
+	std::string trimBuffer(std::string buffer)
+	{
+		std::string trimmed = buffer;
+		trimmed.erase(trimmed.find_last_not_of("\r\n") + 1);
+		return trimmed;
 	}
 }

@@ -9,6 +9,7 @@ namespace utils
 {
 	std::string getPrefix(User *user);
 	std::vector<std::string>	split(std::string msg, std::string chars);
+	std::string trimBuffer(std::string buffer);
 }
 
 #endif
