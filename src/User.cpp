@@ -1,6 +1,6 @@
 #include "../inc/User.hpp"
 
-User::User(int fd): fd(fd), auth(true) //auth will be false later
+User::User(int fd): fd(fd), auth(false)
 {
 	this->auths[0] = Auth("NICK", false);
 	this->auths[1] = Auth("PASS", false);
@@ -41,6 +41,8 @@ void	User::setUsername(std::string username) {this->username = username;}
 void	User::setRealname(std::string realname) {this->realname = realname;}
 
 void	User::setHostname(std::string hostname) {this->hostname = hostname;}
+
+void	User::setAuth() {this->auth = true;}
 
 void	User::setMode(int mode) {this->mode = mode;}
 

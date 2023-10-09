@@ -37,6 +37,7 @@ class User
 		void		setRealname(std::string realname);
 		void		setUsername(std::string username);
 		void		setHostname(std::string hostname);
+		void		setAuth();
 		void		setMode(int mode);
 };
 
