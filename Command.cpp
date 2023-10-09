@@ -7,8 +7,8 @@ namespace Command
 		Command: NICK
 		Parameters: <nickname>
 		NUMERIC REPLIES :
-		-ERR_NONICKNAMEGIVEN	->	":No nickname given"										->	Returned when a nickname parameter expected for a command and isn't found.
-		-ERR_NICKNAMEINUSE		->	"<nick> :Nickname is already in use"						->	Returned when a NICK message is processed that results in
+		+ERR_NONICKNAMEGIVEN	->	":No nickname given"										->	Returned when a nickname parameter expected for a command and isn't found.
+		+ERR_NICKNAMEINUSE		->	"<nick> :Nickname is already in use"						->	Returned when a NICK message is processed that results in
 																									an attempt to change to a currently existing nickname.
 		-ERR_UNAVAILRESOURCE	->	"<nick/channel> :Nick/channel is temporarily unavailable"	->	Returned by a server to a user trying to join a channel
 																									currently blocked by the channel delay mechanism.
@@ -31,14 +31,14 @@ namespace Command
 		std::vector<std::string> spl = utils::split(msg, " ");
 		std::string nick;
 
-		if (spl.size() < 2)
-		{
-			//NUMERIC REPLY -> ERR_NONICKNAMEGIVEN -> :No nickname given
-			std::cout << "Nickname yok" << std::endl;
-		}
+		std::cout << spl.size() << std::endl;
+		if (spl.size() < 2) //check
+			numeric::sendNumeric(ERR_NONICKNAMEGIVEN, server, user);
 		for (int i = 1; i < spl.size(); i++) {
 			nick.append(spl[i]);
 		}
+		if (server->findUser(nick) != NULL) //
+			numeric::sendNumeric(ERR_NICKNAMEINUSE(nick), server, user);
 		if (user->getNickname() != "") {
 			if (user->getNickname() == nick) {
 				//NUMERIC REPLY -> ERR_NICKNAMEINUSE -> <nick> :Nickname is already in use

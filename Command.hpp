@@ -4,6 +4,7 @@
 #include "Server.hpp"
 #include "User.hpp"
 #include "Utils.hpp"
+#include "Numeric.hpp"
 
 class Server;
 
