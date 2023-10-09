@@ -5,6 +5,9 @@ User::User(int fd): fd(fd), auth(true) //auth will be false later
 	this->auths[0] = Auth("NICK", false);
 	this->auths[1] = Auth("PASS", false);
 	this->auths[2] = Auth("USER", false);
+	this->username = "";
+	this->nickname = "";
+	this->realname = "";
 }
 
 int User::getUserFd() const {return (this->fd);}
