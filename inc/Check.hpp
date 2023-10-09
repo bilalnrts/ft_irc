@@ -12,6 +12,7 @@ class User;
 namespace check
 {
 	bool	nick(std::string nick, int size, User *user, Server *server);
+	bool	pass(std::string cmd, std::string pass, int size, User *user, Server *server);
 }
 
 #endif

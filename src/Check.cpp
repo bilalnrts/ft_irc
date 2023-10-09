@@ -26,21 +26,46 @@ namespace check
 	*/
 	bool	nick(std::string nick, int size, User *user, Server *server)
 	{
-		bool	rtn = true;
-
 		if (size < 2) {
 			numeric::sendNumeric(ERR_NONICKNAMEGIVEN, server, user);
-			rtn = false;
+			return (false);
 		}
 		if (server->findUser(nick) != NULL) {
 			numeric::sendNumeric(ERR_NICKNAMEINUSE(nick), server, user);
-			rtn = false;
+			return(false);
 		}
 		if (isnumber(nick[0]) == 1 || nick.size() > 30 || nick.find_first_of(" \t\r\n\v\f") != std::string::npos
 			|| nick.find_first_not_of(VALIDCHARS) != std::string::npos) {
 			numeric::sendNumeric(ERR_ERRONEUSNICKNAME(nick), server, user);
-			rtn = false;
+			return(false);
 		}
-		return (rtn);
+		return (true);
+	}
+
+	/*
+		Command: PASS
+		Parameters: <password>
+		NUMERIC REPLIES :
+		-ERR_NEEDMOREPARAMS		->	"<command> :Not enough parameters"				->	Returned by the server by numerous commands to
+																						indicate to the client that it didn't supply enough parameters.
+		-ERR_ALREADYREGISTRED	->	":Unauthorized command (already registered)"	->	Returned by the server to any link which tries to
+																						change part of the registered details (such as
+																						password or user details from second USER message).
+		EXAMPLE :
+			PASS secretpasswordhere
+	*/
+	bool	pass(std::string cmd, std::string pass, int size, User *user, Server *server)
+	{
+		if (size < 2) {
+			numeric::sendNumeric(ERR_NEEDMOREPARAMS(cmd), server, user);
+			return(false);
+		}
+		if (user->getAuths(cmd)) {
+			numeric::sendNumeric(ERR_ALREADYREGISTRED, server, user);
+			return(false);
+		}
+		if (server->getPassword() != pass)
+			return (false);
+		return(true);
 	}
 }
