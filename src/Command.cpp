@@ -2,50 +2,29 @@
 
 namespace Command
 {
-	/*
-		Command: NICK
-		Parameters: <nickname>
-		NUMERIC REPLIES :
-		+ERR_NONICKNAMEGIVEN	->	":No nickname given"										->	Returned when a nickname parameter expected for a command and isn't found.
-		+ERR_NICKNAMEINUSE		->	"<nick> :Nickname is already in use"						->	Returned when a NICK message is processed that results in
-																									an attempt to change to a currently existing nickname.
-		-ERR_UNAVAILRESOURCE	->	"<nick/channel> :Nick/channel is temporarily unavailable"	->	Returned by a server to a user trying to join a channel
-																									currently blocked by the channel delay mechanism.
-																									Returned by a server to a user trying to change nickname
-																									when the desired nickname is blocked by the nick delay mechanism.
-		-ERR_ERRONEUSNICKNAME	->	"<nick> :Erroneous nickname"								->	Returned after receiving a NICK message which contains
-																									characters which do not fall in the defined set. See
-																									section 2.3.1 for details on valid nicknames.
-		-ERR_NICKCOLLISION		->	"<nick> :Nickname collision KILL from <user>@<host>"		->	Returned by a server to a client when it detects a
-																									nickname collision (registered of a NICK that
-																									already exists by another server).
-		-ERR_RESTRICTED			->	":Your connection is restricted!"							->	Sent by the server to a user upon connection to indicate
-																									the restricted nature of the connection (user mode "+r").
-		EXAMPLE :
-			NICK Wiz
-	*/
-	void	nick(int fd, Server *server, std::string msg) //TOPLAM 6 HATA HANDLE EDİLMESİ LAZIM BURADA, DAHA SONRA HALLEDERİZ
+	void	nick(int fd, Server *server, std::string msg)
 	{
 		User *user = server->findUser(fd);
 		std::vector<std::string> spl = utils::split(msg, " ");
 		std::string nick;
 
-		std::cout << spl.size() << std::endl;
-		if (spl.size() < 2) //check
-			numeric::sendNumeric(ERR_NONICKNAMEGIVEN, server, user);
 		for (size_t i = 1; i < spl.size(); i++) {
 			nick.append(spl[i]);
 		}
-		if (server->findUser(nick) != NULL) //
-			numeric::sendNumeric(ERR_NICKNAMEINUSE(nick), server, user);
-		if (isnumber(nick[0]) == 1 || nick.size() > 30 || nick.find_first_of(" \t\r\n\v\f") != std::string::npos
-			|| nick.find_first_not_of(VALIDCHARS) != std::string::npos)
-			numeric::sendNumeric(ERR_ERRONEUSNICKNAME(nick), server, user);
-		if (user->getNickname() != "") {
-			//BURADA NICK DEĞİŞTİRDİĞİNİ DİĞER CLİENTLERE SÖYLEMEMİZ LAZIM
-			std::cout << nick << std::endl;
+		if (!check::nick(nick, spl.size(), user, server)) {
+			return ;
 		}
 		user->setNickname(nick);
+		user->setAuths("NICK", true);
+		std::vector<Channel *> channels = user->getChannels();
+		for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); it++) {
+			std::vector<User *> users = (*it)->getUserList();
+			for (std::vector<User *>::iterator it2 = users.begin(); it2 != users.end(); it2++) {
+				int toSend = (*it2)->getUserFd();
+				if (fd != toSend)
+					server->sender(toSend, utils::getPrefix(user) + " NICK " + nick);
+			}
+		}
 	}
 
 	/*

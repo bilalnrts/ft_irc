@@ -5,10 +5,9 @@
 #include "User.hpp"
 #include "Utils.hpp"
 #include "Numeric.hpp"
+#include "Check.hpp"
 
 class Server;
-
-#define VALIDCHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]\\`_^{|}-"
 
 namespace Command
 {
