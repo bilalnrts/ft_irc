@@ -35,3 +35,5 @@ void	User::setNickname(std::string nickname) {this->nickname = nickname;}
 void	User::setUsername(std::string username) {this->username = username;}
 
 void	User::setRealname(std::string realname) {this->realname = realname;}
+
+std::vector<Channel *>	User::getChannels() {return (this->channels);}
