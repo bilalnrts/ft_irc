@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../inc/Server.hpp"
 #include <sstream>
 
 int	checkPort(char *p)

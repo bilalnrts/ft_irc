@@ -1,4 +1,4 @@
-#include "User.hpp"
+#include "../inc/User.hpp"
 
 User::User(int fd): fd(fd), auth(true) //auth will be false later
 {

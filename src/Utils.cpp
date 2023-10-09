@@ -1,4 +1,4 @@
-#include "Utils.hpp"
+#include "../inc/Utils.hpp"
 
 namespace utils
 {
@@ -10,7 +10,7 @@ namespace utils
 	std::vector<std::string>	split(std::string msg, std::string chars)
 	{
 		std::vector<std::string>	spl;
-		int							index;
+		size_t						index;
 		std::string					little;
 
 		while ((index = msg.find(chars)) != std::string::npos)

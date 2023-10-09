@@ -1,5 +1,5 @@
-#include "Server.hpp"
-#include "User.hpp"
+#include "../inc/Server.hpp"
+#include "../inc/User.hpp"
 
 Server::Server(int port, std::string password) : serverSocket(-1), PORT(port), password(password)
 {
@@ -62,7 +62,6 @@ void	Server::run()
 
 void	Server::acceptClient(struct pollfd fds[])
 {
-	int					rtn;
 	struct sockaddr_in	clientAddress;
 
 	int	newClient = accept(serverSocket, reinterpret_cast<sockaddr*>(&clientAddress), reinterpret_cast<socklen_t*>(&clientAddress));
@@ -123,7 +122,7 @@ std::ostream &operator<<(std::ostream &o, const Server &s) {
 
 User	*Server::findUser(int fd)
 {
-	for (int i = 0; i < userList.size(); i++) {
+	for (size_t i = 0; i < userList.size(); i++) {
 		if (userList[i]->getUserFd() == fd)
 			return (userList[i]);
 	}
@@ -132,7 +131,7 @@ User	*Server::findUser(int fd)
 
 User	*Server::findUser(std::string nickname)
 {
-	for (int i = 0; i < this->userList.size(); i++)
+	for (size_t i = 0; i < this->userList.size(); i++)
 	{
 		if (this->userList[i]->getNickname() == nickname)
 			return (this->userList[i]);

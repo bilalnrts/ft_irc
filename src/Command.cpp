@@ -1,5 +1,4 @@
-#include "Command.hpp"
-#include <typeinfo>
+#include "../inc/Command.hpp"
 
 namespace Command
 {
@@ -34,7 +33,7 @@ namespace Command
 		std::cout << spl.size() << std::endl;
 		if (spl.size() < 2) //check
 			numeric::sendNumeric(ERR_NONICKNAMEGIVEN, server, user);
-		for (int i = 1; i < spl.size(); i++) {
+		for (size_t i = 1; i < spl.size(); i++) {
 			nick.append(spl[i]);
 		}
 		if (server->findUser(nick) != NULL) //
@@ -98,6 +97,9 @@ namespace Command
 	*/
 	void	user(int fd, Server *server, std::string msg) // YORULDUM SALIYORUM VALLA
 	{
+		(void)fd;
+		(void)server;
+		(void)msg;
 		std::cout << "User komutu calisti" << std::endl;
 	}
 }
