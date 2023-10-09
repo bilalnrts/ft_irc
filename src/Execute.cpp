@@ -1,11 +1,23 @@
 #include "../inc/Execute.hpp"
 
+bool	checkAuth(User *user)
+{
+	if (!user->getAuths("PASS") || !user->getAuths("NICK") || !user->getAuths("USER")) {
+		return (false);
+	}
+	user->setAuth();
+	return (true);
+}
+
 void	Execute::execute(int fd, Server *server, std::string msg)
 {
+	User *user = server->findUser(fd);
 	std::string cmd = msg.substr(0, msg.find(' '));
-	std::cout << "command : " + cmd << std::endl;
-	if (cmd == "NICK" || cmd == "USER" || cmd == "PASS")
+	if (!checkAuth(user) && (cmd != "NICK" && cmd != "USER" && cmd != "PASS"))
 	{
+		server->sender(fd, "Error !\nYou didn't verify your identity yet !");
+	}
+	else {
 		if (cmd == "NICK")
 			Command::nick(fd, server, msg);
 		if (cmd == "USER")
@@ -13,8 +25,4 @@ void	Execute::execute(int fd, Server *server, std::string msg)
 		if (cmd == "PASS")
 			Command::pass(fd, server, msg);
 	}
-	else {
-		std::cout << "KRAL DAHA DIGER KOMUTLARI HANDLE ETMEDIK YA" << std::endl;
-	}
-	//User *user = server->findUser(fd);
 }
