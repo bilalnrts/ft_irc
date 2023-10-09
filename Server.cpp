@@ -130,6 +130,16 @@ User	*Server::findUser(int fd)
 	return (NULL);
 }
 
+User	*Server::findUser(std::string nickname)
+{
+	for (int i = 0; i < this->userList.size(); i++)
+	{
+		if (this->userList[i]->getNickname() == nickname)
+			return (this->userList[i]);
+	}
+	return (NULL);
+}
+
 std::string Server::getPassword() const
 {
 	return (this->password);

@@ -37,6 +37,7 @@ class Server
 		void	run();
 		void	sender(int &fd, std::string message);
 		User				*findUser(int fd);
+		User				*findUser(std::string nickname);
 		std::string			getPassword() const;
 		std::string			getHostname() const;
 		bool				setHostname();
