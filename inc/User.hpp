@@ -24,6 +24,7 @@ class User
 		int			getUserFd() const;
 		bool		isAuth() const;
 		Auth		*getAuths();
+		bool		getAuths(std::string auth);
 		void		setAuths(std::string command, bool x);
 		std::string	getNickname() const;
 		std::string	getUsername() const;

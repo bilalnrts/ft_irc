@@ -37,3 +37,12 @@ void	User::setUsername(std::string username) {this->username = username;}
 void	User::setRealname(std::string realname) {this->realname = realname;}
 
 std::vector<Channel *>	User::getChannels() {return (this->channels);}
+
+bool	User::getAuths(std::string auth)
+{
+	for (int i = 0; i < 3; i++) {
+		if (auth == this->auths[i].first)
+			return (this->auths[i].second);
+	}
+	return (false);
+}
