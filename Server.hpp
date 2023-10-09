@@ -12,14 +12,16 @@
 
 class User;
 class Channel;
+
+#define MAX_CLIENTS 100
+#define MAX_BUFFER_SIZE 1024
+
 class Server
 {
 	private :
 		int						serverSocket;							//Server socket fd && Values are assigned in the start() function
 		struct sockaddr_in		serverAddr;								//Keeps port and protocol information && Values are assigned during creation (constructor)
 		int						PORT;									//Listened port number && Values are assigned during creation (constructor)
-		int						MAX_CLIENTS;							//Max number of users that can connect && Values are assigned during creation (constructor)
-		int						MAX_BUFFER_SIZE;
 		std::vector<User*>		userList;								//List of connected users
 		std::vector<Channel*>	channelList;							//List of created channels
 		std::string				password;								//Server password && has get methods && Values are assigned during creation (constructor)
@@ -29,7 +31,7 @@ class Server
 		void				handleClient(struct pollfd fds[], int index);
 
 	public :
-		Server(int port, int maxClient, int maxBufferSize);
+		Server(int port, std::string password);
 		int		getPort() const;
 		bool	start();
 		void	run();
