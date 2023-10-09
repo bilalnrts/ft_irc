@@ -5,7 +5,7 @@ SRC_DIR		=	src/
 OBJ_DIR		=	obj/
 rm			=	rm -f
 
-SRC_NAMES	=	Channel Command Execute Numeric Server User Utils main
+SRC_NAMES	=	Channel Command Execute Numeric Server User Utils Check main
 SRC_FILES	=	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_NAMES)))
 OBJ_FILES	=	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_NAMES)))
 
