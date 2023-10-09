@@ -97,7 +97,7 @@ void	Server::handleClient(struct pollfd fds[], int index)
 	}
 	else {
 		User *user = this->findUser(fds[index].fd);
-		std::string msg(buffer);
+		std::string msg = utils::trimBuffer(buffer);
 		if (user->isAuth() == false) // I will complete this condition later.
 			std::cout << "Bro kimliğini doğrulamadın !\n" << std::endl;
 		else
