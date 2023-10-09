@@ -68,4 +68,37 @@ namespace check
 			return (false);
 		return(true);
 	}
+
+	/*
+		Command: USER
+		Parameters: <user> <mode> <unused> <realname>
+		NUMERIC REPLIES :
+		-ERR_NEEDMOREPARAMS		->	"<command> :Not enough parameters"				->	Returned by the server by numerous commands to
+																						indicate to the client that it didn't supply enough parameters.
+		-ERR_ALREADYREGISTRED	->	":Unauthorized command (already registered)"	->	Returned by the server to any link which tries to
+																						change part of the registered details (such as
+																						password or user details from second USER message).
+		EXAMPLE :
+			USER guest 0 * :Ronnie Reagan
+	*/
+	bool	user(std::vector<std::string> splWithColon, std::vector<std::string> splWithSpace, User *user, Server *server, int fd)
+	{
+		int					mode;
+		std::stringstream	ss;
+		if (user->getAuths("USER")) {
+			numeric::sendNumeric(ERR_ALREADYREGISTRED, server, user);
+			return (false);
+		}
+		if (splWithColon.size() < 2 || splWithSpace.size() < 5) {
+			numeric::sendNumeric(ERR_NEEDMOREPARAMS(splWithSpace[0]), server, user);
+			return (false);
+		}
+		ss << splWithSpace[2]; // mode param
+		ss >> mode;
+		if (ss.fail()) {
+			server->sender(fd, "Error :Invalid mode");
+			return (false);
+		}
+		return (true);
+	}
 }
