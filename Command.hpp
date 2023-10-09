@@ -8,6 +8,8 @@
 
 class Server;
 
+#define VALIDCHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]\\`_^{|}-"
+
 namespace Command
 {
 	void	nick(int fd, Server *server, std::string msg);

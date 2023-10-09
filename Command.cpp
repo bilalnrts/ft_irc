@@ -39,11 +39,10 @@ namespace Command
 		}
 		if (server->findUser(nick) != NULL) //
 			numeric::sendNumeric(ERR_NICKNAMEINUSE(nick), server, user);
+		if (isnumber(nick[0]) == 1 || nick.size() > 30 || nick.find_first_of(" \t\r\n\v\f") != std::string::npos
+			|| nick.find_first_not_of(VALIDCHARS) != std::string::npos)
+			numeric::sendNumeric(ERR_ERRONEUSNICKNAME(nick), server, user);
 		if (user->getNickname() != "") {
-			if (user->getNickname() == nick) {
-				//NUMERIC REPLY -> ERR_NICKNAMEINUSE -> <nick> :Nickname is already in use
-				std::cout << "Ayni nick" << std::endl;
-			}
 			//BURADA NICK DEĞİŞTİRDİĞİNİ DİĞER CLİENTLERE SÖYLEMEMİZ LAZIM
 			std::cout << nick << std::endl;
 		}
