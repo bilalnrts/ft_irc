@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "User.hpp"
 
-Server::Server(int port, int maxClient, int maxBufferSize) : serverSocket(-1), PORT(port), MAX_CLIENTS(maxClient), MAX_BUFFER_SIZE(maxBufferSize)
+Server::Server(int port, int maxClient, int maxBufferSize) : serverSocket(-1), PORT(port), MAX_CLIENTS(maxClient), MAX_BUFFER_SIZE(maxBufferSize), password("1234")
 {
 	memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
