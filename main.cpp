@@ -1,15 +1,39 @@
 #include "Server.hpp"
+#include <sstream>
 
-const int PORT = 6667;
-const int MAX_CLIENTS = 10;
-const int MAX_BUFFER_SIZE = 1024;
-
-int main()
+int	checkPort(char *p)
 {
-	Server server(PORT, MAX_CLIENTS, MAX_BUFFER_SIZE);
-	if (server.start())
-	{
-		server.run();
+	int					port;
+	std::stringstream	ss;
+
+	ss << p;
+	ss >> port;
+	if (!ss.fail()) {
+		if (port > 0 && port < 65535) {
+			return (port);
+		} else {
+			perror("Error !\nPort number is not in range !\n <0> - <65535>");
+		}
+	} else {
+		perror("Error !\nPort is not int!\n");
+	}
+	return (0);
+}
+
+int main(int ac, char **av)
+{
+	if (ac == 3) {
+		int port = checkPort(av[1]);
+		if (port) {
+			Server server(port, av[2]);
+			if (server.start())
+			{
+				server.run();
+			}
+		}
+	}
+	else {
+		std::cout << "Error !\nWrong number of parameters! <./ircserver> <port> <password>" << std::endl;
 	}
 	return 0;
 }
