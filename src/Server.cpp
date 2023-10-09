@@ -95,12 +95,8 @@ void	Server::handleClient(struct pollfd fds[], int index)
 		perror("Error !\nrecv didn't work as excepted!\n");
 	}
 	else {
-		User *user = this->findUser(fds[index].fd);
 		std::string msg = utils::trimBuffer(buffer);
-		if (user->isAuth() == false) // I will complete this condition later.
-			std::cout << "Bro kimliğini doğrulamadın !\n" << std::endl;
-		else
-			exec.execute(fds[index].fd, this, msg);
+		exec.execute(fds[index].fd, this, msg);
 	}
 }
 
