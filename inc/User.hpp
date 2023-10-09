@@ -17,6 +17,7 @@ class User
 		std::string				realname;
 		std::string				nickname;
 		std::string				hostname;
+		int						mode;
 		std::vector<Channel *>	channels;
 
 	public :
@@ -29,10 +30,14 @@ class User
 		std::string	getNickname() const;
 		std::string	getUsername() const;
 		std::string	getHostname() const;
+		std::string	getRealname() const;
+		int			getMode() const;
 		std::vector<Channel *>	getChannels();
 		void		setNickname(std::string nickname);
 		void		setRealname(std::string realname);
 		void		setUsername(std::string username);
+		void		setHostname(std::string hostname);
+		void		setMode(int mode);
 };
 
 #endif
