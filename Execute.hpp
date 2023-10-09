@@ -2,6 +2,8 @@
 #define EXECUTE_HPP
 
 #include "Server.hpp"
+#include "Command.hpp"
+#include <vector>
 
 class Server;
 
