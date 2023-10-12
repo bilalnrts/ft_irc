@@ -155,3 +155,59 @@ bool	Server::setHostname()
 	this->hostname = hName;
 	return (true);
 }
+
+void Server::addChannelList(Channel *channel)
+{
+	this->channelList.push_back(channel);
+}
+
+
+bool Server::findChannel(std::string name)
+{
+	for (size_t i = 0; i < this->channelList.size(); i++)
+	{
+		if (this->channelList[i]->getName() == name)
+			return (true);
+	}
+	return (false);
+}
+
+Channel	*Server::getChannel(std::string name)
+{
+	for (size_t i = 0; i < this->channelList.size(); i++)
+	{
+		if (this->channelList[i]->getName() == name)
+			return (this->channelList[i]);
+	}
+	return (NULL);
+}
+
+void	Server::removeChannel(Channel *channel)
+{
+	for (size_t i = 0; i < this->channelList.size(); i++)
+	{
+		if (this->channelList[i] == channel)
+		{
+			this->channelList.erase(this->channelList.begin() + i);
+			break ;
+		}
+	}
+}
+
+void	Server::removeUser(User *user)
+{
+	for (size_t i = 0; i < this->userList.size(); i++)
+	{
+		if (this->userList[i] == user)
+		{
+			this->userList.erase(this->userList.begin() + i);
+			close(user->getUserFd());
+			break ;
+		}
+	}
+}
+
+std::vector<Channel*>	Server::getChannelList()
+{
+	return (this->channelList);
+}	

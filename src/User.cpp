@@ -56,3 +56,17 @@ bool	User::getAuths(std::string auth)
 	}
 	return (false);
 }
+
+void	User::addChannel(Channel *channel)
+{
+	this->channels.push_back(channel);
+}
+
+void User::removeChannel(Channel *channel)
+{
+	for (size_t i = 0; i < this->channels.size(); i++) {
+		if (this->channels[i] == channel)
+			this->channels.erase(this->channels.begin() + i);
+	}
+}
+

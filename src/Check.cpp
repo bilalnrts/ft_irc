@@ -101,4 +101,26 @@ namespace check
 		}
 		return (true);
 	}
+
+
+	/*
+		Command: JOIN
+		Parameters: <channel>{,<channel>} [<key>{,<key>}]
+		NUMERIC REPLIES :
+		-ERR_NEEDMOREPARAMS		->	"<command> :Not enough parameters"				->	Returned by the server by numerous commands to
+																						indicate to the client that it didn't supply enough parameters.
+		-ERR_NOSUCHCHANNEL		->	"<channel> :No such channel"						->	Returned to a client which is attempting to join a
+																						channel which doesn't exist.
+		EXAMPLE :
+			JOIN #foobar
+			
+			:	Wiz JOIN #Twilight_zone	; Command to join channel #Twilight_zone as Wiz.
+	*/
+
+/* int checkJoin(std::string msg, User *user, Server *server)
+	{
+		msg = msg.substr(msg.find(' ') + 1);
+		user = server->findUser(user->getNickname());
+		
+	} */
 }

@@ -14,6 +14,6 @@ namespace numeric
 	void sendNumeric(Numeric reply, Server *server, User *user)
 	{
 		int fd = user->getUserFd();
-		server->sender(fd, server->getHostname() + " " + reply.first + " " + user->getNickname() + " " + reply.second);
+		server->sender(fd, ":" + server->getHostname() + " " + reply.first + " " + user->getNickname() + " " + reply.second); // added : + 
 	}
 }

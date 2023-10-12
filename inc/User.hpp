@@ -11,7 +11,6 @@ class User
 {
 	private :
 		int						fd;
-		bool					auth;
 		Auth					auths[3];
 		std::string				username;
 		std::string				realname;
@@ -21,6 +20,7 @@ class User
 		std::vector<Channel *>	channels;
 
 	public :
+		bool					auth; //public for now
 		User(int fd);
 		int			getUserFd() const;
 		bool		isAuth() const;
@@ -39,6 +39,9 @@ class User
 		void		setHostname(std::string hostname);
 		void		setAuth();
 		void		setMode(int mode);
+		void 		addChannel(Channel *channel); // add a user to the channel
+		void		removeChannel(Channel *channel); // remove a user from the channel
+		void		getChannelName(Channel *channel); // get a channel from the user
 };
 
 #endif

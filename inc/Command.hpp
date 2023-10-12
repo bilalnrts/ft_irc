@@ -14,6 +14,13 @@ namespace Command
 	void	nick(int fd, Server *server, std::string msg);
 	void	pass(int fd, Server *server, std::string msg);
 	void	user(int fd, Server *server, std::string msg);
+	void	join(int fd, Server *server, std::string msg);
+	void	part(int fd, Server *server, std::string msg);
+	void	privMsg(int fd, Server *server, std::vector<std::string> split);
+	void	topic(int fd, Server *server, std::vector<std::string> split);
+	void	quit(int fd, Server *server, std::vector<std::string> split);
+	void 	notice(int fd , Server *server, std::vector<std::string> split);
+
 }
 
 #endif

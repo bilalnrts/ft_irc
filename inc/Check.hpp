@@ -15,6 +15,7 @@ namespace check
 	bool	nick(std::string nick, int size, User *user, Server *server);
 	bool	pass(std::string cmd, std::string pass, int size, User *user, Server *server);
 	bool	user(std::vector<std::string> splWithColon, std::vector<std::string> splWithSpace, User *user, Server *server, int fd);
+	int		checkJoin(std::string msg, User *user, Server *server);
 }
 
 #endif

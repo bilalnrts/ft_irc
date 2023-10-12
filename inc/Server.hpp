@@ -36,11 +36,17 @@ class Server
 		bool	start();
 		void	run();
 		void	sender(int &fd, std::string message);
+		void	addChannelList(Channel *channel); // add a channel to the channel list
 		User				*findUser(int fd);
 		User				*findUser(std::string nickname);
 		std::string			getPassword() const;
 		std::string			getHostname() const;
+		Channel				*getChannel(std::string name);
 		bool				setHostname();
+		bool				findChannel(std::string name); //returns a vector of channels with the same name
+		void				removeChannel(Channel *channel); // remove a channel from the channel list
+		void				removeUser(User *user); // remove a user from the user list -- closed user fd
+		std::vector<Channel*>	getChannelList();
 };
 
 std::ostream &operator<<(std::ostream &o, const Server &s);
