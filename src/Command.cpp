@@ -134,15 +134,15 @@ namespace Command
 
 	void privMsg(int fd, Server *server, std::vector<std::string> split)
 	{
-			std::string msg = "";
-			if (split.size() == 2)
-				std::string msg = split[1];
-			else
-				std::string msg = split[2];
-
 			User *user = server->findUser(fd);
-			Channel *channel = server->getChannel(msg);
+			Channel *channel = server->getChannel(split[1]);
+			std::string msg = "";
 			std::string channelName = channel->getName();
+
+			if (split.size() == 2)
+				msg = split[1];
+			else
+				msg = split[2];
 			if (channel == NULL)
 			{
 				numeric::sendNumeric(ERR_NOSUCHNICK(channelName), server, user);
