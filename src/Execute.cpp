@@ -101,7 +101,7 @@ void topicControl(int &fd, Server *server, std::vector<std::string> split)
 	{
 		numeric::sendNumeric(RPL_NOTOPIC(user->getNickname(), split[1]), server, user);
 	}
-	else if (split[1][0] == '#' && split[2] != "" || split[2][0] != ':')
+	else if ((split[1][0] == '#' && split[2] != "") || split[2][0] != ':')
 	{
 		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
 	}
