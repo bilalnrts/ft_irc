@@ -5,11 +5,11 @@
 
 bool	checkAuth(User *user, Server *server)
 {
-	if (!user->getAuths("PASS") || !user->getAuths("NICK") || !user->getAuths("USER")) {		
+	if (!user->getAuths("PASS") || !user->getAuths("NICK") || !user->getAuths("USER")) {
 		return (false);
 	}
 	user->setAuth();
-	if (user->isAuth() == true) 
+	if (user->isAuth() == true)
 	{
 		std::string nickname = user->getNickname();
 		std::string username = user->getUsername();
@@ -79,12 +79,31 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 void topicControl(int &fd, Server *server, std::vector<std::string> split)
 {
 	User *user = server->findUser(fd);
-	if (split.size() == 2)
+
+	if (split[1][0] == '#' && split[2] != "" && split[2][0] == ':') {
+    int size = split.size();
+	split[2].erase(0, 1);
+
+    std::string message;
+    for (int i = 2; i < size; i++) {
+        message += split[i];
+        if (i < size - 1) {
+            message += " ";
+        }
+    }
+	std::vector<std::string> newsplit;
+	newsplit.push_back(split[0]);
+	newsplit.push_back(split[1]);
+	newsplit.push_back(message);
+	Command::topic(fd, server, newsplit);
+	}
+	else if (split[1][0] == '#' && split[2] == "")
 	{
-		if (split[1][0] == '#')
-			Command::topic(fd, server, split);
-		else
-			numeric::sendNumeric(RPL_NOTOPIC(split[1], ), server, user);  //check this line
+		numeric::sendNumeric(RPL_NOTOPIC(user->getNickname(), split[1]), server, user);
+	}
+	else if (split[1][0] == '#' && split[2] != "" || split[2][0] != ':')
+	{
+		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
 	}
 	else
 		return ;
@@ -98,7 +117,7 @@ void quitControl(int &fd, Server *server, std::vector<std::string> split)
 	}
 	else
 		return ; //add if commnad quit without message
-		
+
 }
 
 void noticeControl(int &fd, Server *server, std::vector<std::string> split)
@@ -120,12 +139,12 @@ void cmdall(int &fd, Server *server, std::string msg)
 	std::vector<std::string> split = utils::split(msg, " ");
 	for (size_t i = 0;  i < split.size(); i++)
 	{
-		std::cout << "--------------------------------" << std::endl; 
+		std::cout << "--------------------------------" << std::endl;
 		if (i == 0)
-			std::cout << "User : " << server->findUser(fd)->getNickname() << std::endl; 
+			std::cout << "User : " << server->findUser(fd)->getNickname() << std::endl;
 		std::cout << "Message: " << split[i] << std::endl;
 		std::cout << "Client fd -> " << fd << std::endl;
-		std::cout << "--------------------------------" << std::endl; 
+		std::cout << "--------------------------------" << std::endl;
 	}
 	if (split[0] == "JOIN")
 		joinControl(fd, server, split);
@@ -162,6 +181,6 @@ void	Execute::execute(int fd, Server *server, std::string msg)
 		{
 			cmdall(fd, server, msg);
 		}
-		
+
 	}
 }
