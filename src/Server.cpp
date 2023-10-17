@@ -76,7 +76,7 @@ void	Server::acceptClient(struct pollfd fds[])
 			fds[i].fd = newClient;
 			fds[i].events = POLLIN;
 			this->userList.push_back(new User(fds[i].fd));
-			this->sender(fds[i].fd, "Bilo'nun IRC Serverina hosgeldin !");
+			this->sender(fds[i].fd, "Bilo'nun IRC Serverina hosgeldin !"); //düzelt
 			break ;
 		}
 	}
@@ -210,4 +210,4 @@ void	Server::removeUser(User *user)
 std::vector<Channel*>	Server::getChannelList()
 {
 	return (this->channelList);
-}	
+}
