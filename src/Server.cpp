@@ -35,6 +35,7 @@ void	Server::run()
 	struct pollfd fds[MAX_CLIENTS];
 	fds[0].fd = serverSocket;
 	fds[0].events = POLLIN;
+	Execute exec;
 
 	for (int i = 1; i < MAX_CLIENTS; ++i) {
 		fds[i].fd = -1;
@@ -53,6 +54,12 @@ void	Server::run()
 				handleClient(fds, i);
 			else if (fds[i].fd != -1 && (fds[i].revents == POLLHUP )) {
 				close(fds[i].fd);
+				User *user = this->findUser(fds[i].fd);
+				if (user) {
+					exec.execute(fds[i].fd, this, "JOIN #0");
+					this->removeUser(this->findUser(fds[i].fd));
+					delete user;
+				}
 				fds[i].fd = -1;
 			}
 		}
