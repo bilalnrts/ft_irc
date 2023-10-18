@@ -232,6 +232,7 @@ namespace Command
 
 	void notice (int fd , Server *server, std::vector<std::string> split)
 	{
+		
 		std::string channelName = split[1];
 		std::string message = split[2];
 
