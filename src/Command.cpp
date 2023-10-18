@@ -30,7 +30,7 @@ namespace Command
 	void	pass(int fd, Server *server, std::string msg)
 	{
 		User *user = server->findUser(fd);
-		std::vector<std::string> spl = utils::split(msg, " ");
+		std::vector<std::string> spl = utils::split(msg, ":");
 
 		if (check::pass(spl[0], spl[1], spl.size(), user, server)) {
 			user->setAuths("PASS", true);
@@ -58,6 +58,22 @@ namespace Command
 		std::cout << "Real : " + user->getRealname() << std::endl;
 		std::cout << "Host : " + user->getHostname() << std::endl;
 		std::cout << "Mode : " << user->getMode() << std::endl;
+	}
+
+	void	cap(int fd, Server *server, std::string msg)
+	{
+		User *user = server->findUser(fd);
+		(void)msg;
+		if (user->getCap() == false)
+		{
+			server->sender(fd, "CAP * LS :multi-prefix sasl");
+			user->setCap(true);
+		}
+		else
+		{
+			server->sender(fd, "CAP * ACK multi-prefix");
+			user->setCap(false);
+		}
 	}
 
 	void	join(int fd, Server *server, std::string msg)
@@ -117,7 +133,7 @@ namespace Command
 			// must be change owner
 		channel->removeUser(user);
 		user->removeChannel(channel);
-		// must be a remove operator 
+		// must be a remove operator
 		std::vector<User*> users = channel->getUserList();
 		for (std::vector<User*>::iterator it = users.begin(); it != users.end(); it++)
 		{
