@@ -52,7 +52,6 @@ void	Server::run()
 			if (fds[i].fd != -1 && (fds[i].revents == POLLIN))
 				handleClient(fds, i);
 			else if (fds[i].fd != -1 && (fds[i].revents == POLLHUP )) {
-				//will create close process here
 				close(fds[i].fd);
 				fds[i].fd = -1;
 			}
@@ -184,26 +183,17 @@ Channel	*Server::getChannel(std::string name)
 
 void	Server::removeChannel(Channel *channel)
 {
-	for (size_t i = 0; i < this->channelList.size(); i++)
-	{
-		if (this->channelList[i] == channel)
-		{
-			this->channelList.erase(this->channelList.begin() + i);
-			break ;
-		}
+	std::vector<Channel *>::iterator it = std::find(channelList.begin(), channelList.end(), channel);
+	if (it != channelList.end()) {
+		channelList.erase(it);
 	}
 }
 
 void	Server::removeUser(User *user)
 {
-	for (size_t i = 0; i < this->userList.size(); i++)
-	{
-		if (this->userList[i] == user)
-		{
-			this->userList.erase(this->userList.begin() + i);
-			close(user->getUserFd());
-			break ;
-		}
+	std::vector<User *>::iterator it = std::find(userList.begin(), userList.end(), user);
+	if (it != userList.end()) {
+		userList.erase(it);
 	}
 }
 
