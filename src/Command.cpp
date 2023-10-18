@@ -253,4 +253,39 @@ namespace Command
 			}
 		}
 	}
+
+	void kick (int fd , Server *server, std::vector<std::string> split)
+	{
+		int size = split.size();
+		std::string channelName = split[1];
+		std::string nickName = split[2];
+		Channel *channel = server->getChannel(channelName);
+		User *user = server->findUser(fd);
+		User *user2 = server->findUser(nickName);
+		if (channel->getOwner() != user)
+		{
+			numeric::sendNumeric(ERR_CHANOPRIVSNEEDED(channelName), server, user);
+			return ;
+		}
+		std::vector<User *> users = channel->getUserList();
+		for (std::vector<User *>::iterator it = users.begin(); it != users.end(); it++)
+		{
+			int toSend = (*it)->getUserFd();
+			if (fd != toSend)
+				server->sender(toSend, utils::getPrefix(user) + " KICK " + channelName + " " + nickName);
+			else if (fd != toSend && size == 4)
+			{
+				std::string message = split[3];
+				server->sender(toSend, utils::getPrefix(user) + " KICK " + channelName + " " + nickName + " :" + message);
+			}
+		}
+		channel->removeUser(user2);
+		user2->removeChannel(channel);
+		if (channel->getUserList().size() == 0)
+		{
+			server->removeChannel(channel);
+			delete channel;
+			return ;
+		}
+	}
 }

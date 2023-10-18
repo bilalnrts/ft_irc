@@ -133,6 +133,44 @@ void noticeControl(int &fd, Server *server, std::vector<std::string> split)
 		return ;
 }
 
+void kickcontrol(int &fd, Server *server, std::vector<std::string> split)
+{
+	// command = > KICK #channel user 
+	if (split[1][0] == '#' && split[2] != "") {
+		int size = split.size();
+		if (size == 3)
+		{
+			Command::kick(fd, server, split);
+		}
+		else if (size > 3)
+		{ //Command = > KICK #channel user :message
+			if (split[3][0] == ':')
+			{
+				split[3].erase(0, 1);
+				std::string message;
+				for (int i = 3; i < size; i++) {
+					message += split[i];
+					if (i < size - 1) {
+						message += " ";
+					}
+				}
+				std::vector<std::string> newsplit;
+				newsplit.push_back(split[0]);
+				newsplit.push_back(split[1]);
+				newsplit.push_back(split[2]);
+				newsplit.push_back(message);
+				Command::kick(fd, server, newsplit);
+			}
+			else
+				return ;
+		}
+	}
+	else
+	{
+		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, server->findUser(fd));
+	}	
+}
+
 
 void cmdall(int &fd, Server *server, std::string msg)
 {
@@ -159,8 +197,10 @@ void cmdall(int &fd, Server *server, std::string msg)
 		quitControl(fd, server, split);
 	else if (split[0] == "NOTICE")
 		noticeControl(fd, server, split);
+	else if (split[0] == "KICK")
+		kickcontrol(fd, server, split);
 	else
-		std::cout << "Command not found !" << std::endl;
+		return ;
 }
 
 bool	checkEnter(std::string msg)
@@ -182,8 +222,13 @@ void	Execute::execute(int fd, Server *server, std::string msg)
 	}
 	User *user = server->findUser(fd);
 	std::string cmd = msg.substr(0, msg.find(' '));
+	bool auth = user->isAuth();
 
-	if (!checkAuth(user, server) && (cmd != "NICK" && cmd != "USER" && cmd != "PASS" && cmd != "CAP"))
+	if (auth == false)
+	{
+		checkAuth(user, server);
+	}
+	if (user->isAuth() != true && (cmd != "NICK" && cmd != "USER" && cmd != "PASS" && cmd != "CAP"))
 	{
 		server->sender(fd, "Error !\nYou didn't verify your identity yet !");
 		std::cout << msg << std::endl;

@@ -21,6 +21,7 @@ namespace Command
 	void	topic(int fd, Server *server, std::vector<std::string> split);
 	void	quit(int fd, Server *server, std::vector<std::string> split);
 	void 	notice(int fd , Server *server, std::vector<std::string> split);
+	void 	kick (int fd , Server *server, std::vector<std::string> split);
 
 }
 
