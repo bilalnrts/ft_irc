@@ -34,6 +34,8 @@ std::string User::getRealname() const {return (this->realname);}
 
 int User::getMode() const {return (this->mode);}
 
+bool User::getCap() {return (this->cap);}
+
 void	User::setNickname(std::string nickname) {this->nickname = nickname;}
 
 void	User::setUsername(std::string username) {this->username = username;}
@@ -43,6 +45,8 @@ void	User::setRealname(std::string realname) {this->realname = realname;}
 void	User::setHostname(std::string hostname) {this->hostname = hostname;}
 
 void	User::setAuth() {this->auth = true;}
+
+void	User::setCap(bool x) {this->cap = x;}
 
 void	User::setMode(int mode) {this->mode = mode;}
 

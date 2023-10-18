@@ -18,6 +18,7 @@ class User
 		std::string				hostname;
 		int						mode;
 		std::vector<Channel *>	channels;
+		bool					cap;
 
 	public :
 		bool					auth; //public for now
@@ -32,12 +33,14 @@ class User
 		std::string	getHostname() const;
 		std::string	getRealname() const;
 		int			getMode() const;
+		bool		getCap();
 		std::vector<Channel *>	getChannels();
 		void		setNickname(std::string nickname);
 		void		setRealname(std::string realname);
 		void		setUsername(std::string username);
 		void		setHostname(std::string hostname);
 		void		setAuth();
+		void		setCap(bool x);
 		void		setMode(int mode);
 		void 		addChannel(Channel *channel); // add a user to the channel
 		void		removeChannel(Channel *channel); // remove a user from the channel
