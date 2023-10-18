@@ -51,29 +51,34 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 {
 	User *user = server->findUser(fd);
 	std::string nickName = user->getNickname();
-	if (split.size() == 2)
-	{
-		if (split[1][0] == '#')
-			Command::privMsg(fd, server, split);
-		else
-		{
-			User *user1 = server->findUser(nickName);
-			if (user == NULL)
-				numeric::sendNumeric(ERR_NOSUCHNICK(split[1]), server, user1);
-			else
-			{
-				int recvfd = user->getUserFd();
-				server->sender(recvfd, utils::getPrefix(server->findUser(fd)) + " PRIVMSG " + split[1] + " :" + split[1]);    // check this line
-			}
-		}
+
+	if (split[1][0] == '#' && split[2] != "" && split[2][0] == ':') {
+    int size = split.size();
+	split[2].erase(0, 1);
+    std::string message;
+    for (int i = 2; i < size; i++) {
+        message += split[i];
+        if (i < size - 1) {
+            message += " ";
+        }
+    }
+	std::vector<std::string> newsplit;
+	newsplit.push_back(split[0]);
+	newsplit.push_back(split[1]);
+	newsplit.push_back(message);
+	Command::privMsg(fd, server, newsplit);
 	}
-	else if (split.size() == 3)
+	else if (split[1][0] == '#' && split[2] == "")
 	{
-		if (split[1][0] == '#' && split[2] != "")
-			Command::privMsg(fd, server, split);
-	}
-	else if (split.size() < 2)
 		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
+	}
+	else if ((split[1][0] == '#' && split[2] != "") || split[2][0] != ':')
+	{
+		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
+	}
+	else
+		return ;
+
 }
 
 void topicControl(int &fd, Server *server, std::vector<std::string> split)
