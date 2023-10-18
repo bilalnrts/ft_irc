@@ -137,15 +137,16 @@ void noticeControl(int &fd, Server *server, std::vector<std::string> split)
 void cmdall(int &fd, Server *server, std::string msg)
 {
 	std::vector<std::string> split = utils::split(msg, " ");
-	for (size_t i = 0;  i < split.size(); i++)
-	{
-		std::cout << "--------------------------------" << std::endl;
-		if (i == 0)
-			std::cout << "User : " << server->findUser(fd)->getNickname() << std::endl;
-		std::cout << "Message: " << split[i] << std::endl;
-		std::cout << "Client fd -> " << fd << std::endl;
-		std::cout << "--------------------------------" << std::endl;
-	}
+	// for (size_t i = 0;  i < split.size(); i++)
+	// {
+	// 	std::cout << "--------------------------------" << std::endl;
+	// 	if (i == 0)
+	// 		std::cout << "User : " << server->findUser(fd)->getNickname() << std::endl;
+	// 	std::cout << "Message: " << split[i] << std::endl;
+	// 	std::cout << "Client fd -> " << fd << std::endl;
+	// 	std::cout << "--------------------------------" << std::endl;
+	// }
+	std::cout << msg << std::endl;
 	if (split[0] == "JOIN")
 		joinControl(fd, server, split);
 	else if (split[0] == "PART")
@@ -162,21 +163,40 @@ void cmdall(int &fd, Server *server, std::string msg)
 		std::cout << "Command not found !" << std::endl;
 }
 
+bool	checkEnter(std::string msg)
+{
+	for (size_t i = 0; i < msg.length(); i++) {
+		if (msg[i] == '\n')
+			return (true);
+	}
+	return (false);
+}
+
 void	Execute::execute(int fd, Server *server, std::string msg)
 {
+	if (checkEnter(msg)) {
+		std::vector<std::string> splCmd = utils::split(msg, "\n");
+		for (size_t i = 0; i < splCmd.size(); i++) {
+			Execute::execute(fd, server, utils::trimBuffer(splCmd[i]));
+		}
+	}
 	User *user = server->findUser(fd);
 	std::string cmd = msg.substr(0, msg.find(' '));
-	if (!checkAuth(user, server) && (cmd != "NICK" && cmd != "USER" && cmd != "PASS"))
+
+	if (!checkAuth(user, server) && (cmd != "NICK" && cmd != "USER" && cmd != "PASS" && cmd != "CAP"))
 	{
 		server->sender(fd, "Error !\nYou didn't verify your identity yet !");
+		std::cout << msg << std::endl;
 	}
 	else {
 		if (cmd == "NICK")
 			Command::nick(fd, server, msg);
-		if (cmd == "USER")
+		else if (cmd == "USER")
 			Command::user(fd, server, msg);
-		if (cmd == "PASS")
+		else if (cmd == "PASS")
 			Command::pass(fd, server, msg);
+		else if (cmd == "CAP")
+			Command::cap(fd, server, msg);
 		else
 		{
 			cmdall(fd, server, msg);
