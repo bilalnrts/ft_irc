@@ -116,7 +116,6 @@ namespace Command
 				allnickname += (*it)->getNickname() + " ";
 			if (channel->getOwner() == user)
 				allnickname += "@";
-			allnickname += (*it)->getNickname();
 		}
 		numeric::sendNumeric(RPL_NAMEREPLY(nickname, channelName, allnickname), server, user);
 		numeric::sendNumeric(RPL_ENDOFNAMES(nickname, channelName), server, user);

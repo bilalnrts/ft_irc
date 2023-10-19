@@ -262,6 +262,16 @@ void	Execute::execute(int fd, Server *server, std::string msg)
 	if (auth == false)
 	{
 		checkAuth(user);
+			if (user->isAuth() == true)
+			{
+			std::string nickname = user->getNickname();
+			std::string username = user->getUsername();
+			std::string hostname = user->getHostname();
+			std::string createtime = utils::getTime();
+			numeric::sendNumeric(RPL_WELCOME(nickname, username, hostname), server, user);
+			numeric::sendNumeric(RPL_YOURSERVICE(nickname, hostname), server, user);
+			numeric::sendNumeric(RPL_CREATED(nickname,createtime), server, user);
+			}
 	}
 	if (user->isAuth() != true && (cmd != "NICK" && cmd != "USER" && cmd != "PASS" && cmd != "CAP"))
 	{
