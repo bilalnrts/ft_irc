@@ -139,7 +139,7 @@ void quitControl(int &fd, Server *server, std::vector<std::string> split)
 	}
 	else
 	{
-
+		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, server->findUser(fd));
 	}
 }
 
