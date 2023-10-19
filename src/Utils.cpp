@@ -37,4 +37,24 @@ namespace utils
 		std::string time = std::to_string(ltm->tm_hour) + ":" + std::to_string(ltm->tm_min) + ":" + std::to_string(ltm->tm_sec);
 		return (time);
 	}
+
+	bool	checkAuth(User *user)
+	{
+		if (!user->getAuths("PASS") || !user->getAuths("NICK") || !user->getAuths("USER")) {
+			return (false);
+		}
+		user->setAuth();
+		return (true);
+	}
+
+	void	welcome(User *user, Server *server)
+	{
+		std::string nickname = user->getNickname();
+		std::string username = user->getUsername();
+		std::string hostname = user->getHostname();
+		std::string createtime = utils::getTime();
+		numeric::sendNumeric(RPL_WELCOME(nickname, username, hostname), server, user);
+		numeric::sendNumeric(RPL_YOURSERVICE(nickname, hostname), server, user);
+		numeric::sendNumeric(RPL_CREATED(nickname,createtime), server, user);
+	}
 }

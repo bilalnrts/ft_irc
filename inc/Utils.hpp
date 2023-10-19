@@ -11,6 +11,8 @@ namespace utils
 	std::vector<std::string>	split(std::string msg, std::string chars);
 	std::string trimBuffer(std::string buffer);
 	std::string getTime();
+	bool		checkAuth(User *user);
+	void		welcome(User *user, Server *server);
 }
 
 #endif
