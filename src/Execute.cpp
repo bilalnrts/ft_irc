@@ -43,7 +43,7 @@ void partControl(int &fd, Server *server, std::vector<std::string> split)
 		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, server->findUser(fd));
 }
 
-void	privMsgHelper(int &fd, Server *server, std::vector<std::string> split)
+std::vector<std::string>	splitHelper(int &fd, Server *server, std::vector<std::string> split)
 {
 		split[2].erase(0, 1);
 		std::string message;
@@ -57,7 +57,8 @@ void	privMsgHelper(int &fd, Server *server, std::vector<std::string> split)
 		newsplit.push_back(split[0]);
 		newsplit.push_back(split[1]);
 		newsplit.push_back(message);
-		Command::privMsg(fd, server, newsplit);
+
+		return newsplit;
 }
 
 void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
@@ -76,7 +77,7 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 			numeric::sendNumeric(ERR_NOSUCHNICK(split[1]), server, user);
 			return ;
 		}
-		privMsgHelper(fd, server, split);
+		
 	}
 	else if (split[1][0] != '#')
 	{
@@ -86,7 +87,8 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 			numeric::sendNumeric(ERR_NOSUCHNICK(split[1]), server, user);
 			return ;
 		}
-		privMsgHelper(fd, server, split);
+		std::vector<std::string> newsplit = splitHelper(fd, server, split);
+		Command::privMsg(fd, server, newsplit);
 	}
 }
 
@@ -95,20 +97,8 @@ void topicControl(int &fd, Server *server, std::vector<std::string> split)
 	User *user = server->findUser(fd);
 
 	if (split[1][0] == '#' && split[2] != "" && split[2][0] == ':') {
-    int size = split.size();
-	split[2].erase(0, 1);
 
-    std::string message;
-    for (int i = 2; i < size; i++) {
-        message += split[i];
-        if (i < size - 1) {
-            message += " ";
-        }
-    }
-	std::vector<std::string> newsplit;
-	newsplit.push_back(split[0]);
-	newsplit.push_back(split[1]);
-	newsplit.push_back(message);
+	std::vector<std::string> newsplit = splitHelper(fd, server, split);
 	Command::topic(fd, server, newsplit);
 	}
 	else if (split[1][0] == '#' && split[2] == "")
@@ -140,25 +130,15 @@ void noticeControl(int &fd, Server *server, std::vector<std::string> split)
 	User *user = server->findUser(fd);
 	std::string nickName = user->getNickname();
 
-	if (split[1][0] == '#' && split[2] != "") {
-		int size = split.size();
+	if (split[1][0] == '#' && split[2][0] == ':') {
 		if (split.size() == 3)
 		{
+			split[2].erase(0, 1);
 			Command::notice(fd, server, split);
 		}
-		else if (size > 3)
+		else if (split.size() > 3)
 		{
-				std::string message;
-				for (int i = 2; i < size; i++) {
-					message += split[i];
-					if (i < size - 1) {
-						message += " ";
-					}
-				}
-				std::vector<std::string> newsplit;
-				newsplit.push_back(split[0]);
-				newsplit.push_back(split[1]);
-				newsplit.push_back(message);
+				std::vector<std::string> newsplit = splitHelper(fd, server, split);
 				Command::notice(fd, server, newsplit);
 		}
 	}
@@ -185,18 +165,7 @@ void kickcontrol(int &fd, Server *server, std::vector<std::string> split)
 		{ //Command = > KICK #channel user :message
 			if (split[2][0] == ':')
 			{
-				split[2].erase(0, 1);
-				std::string message;
-				for (int i = 2; i < size; i++) {
-					message += split[i];
-					if (i < size - 1) {
-						message += " ";
-					}
-				}
-				std::vector<std::string> newsplit;
-				newsplit.push_back(split[0]);
-				newsplit.push_back(split[1]);
-				newsplit.push_back(message);
+				std::vector<std::string> newsplit = splitHelper(fd, server, split);
 				Command::kick(fd, server, newsplit);
 			}
 			else
