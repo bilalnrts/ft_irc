@@ -81,8 +81,6 @@ namespace Command
 		Channel *channel = server->getChannel(msg);
 		User	*user = server->findUser(fd);
 
-		/* if (check::checkJoin(msg, user, server))
-			return ; */
 		if (channel == NULL)
 		{
 			Channel *channel = new Channel(msg);
@@ -202,10 +200,8 @@ namespace Command
 				numeric::sendNumeric(RPL_NOTOPIC(user->getNickname(), channelName), server, user);
 		}
 		if (!&topic)
-			// add numeric
-			return ;
+			numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
 		else
-			// add numeric
 			return ;
 	}
 
@@ -214,7 +210,7 @@ namespace Command
 		User *user = server->findUser(fd);
 		if (split[1][0] == ':')
 			split[1].erase(0, 1);
-		std::string channelName = split[1];
+		std::string message = split[1];
 		std::vector<Channel *> channels = user->getChannels();
 		for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); it++)
 		{
@@ -223,7 +219,7 @@ namespace Command
 			{
 				int toSend = (*it2)->getUserFd();
 				if (fd != toSend)
-					server->sender(toSend, utils::getPrefix(user) + " QUIT :" + channelName);
+					server->sender(toSend, utils::getPrefix(user) + " QUIT :" + message);
 			}
 		}
 		server->removeUser(user);

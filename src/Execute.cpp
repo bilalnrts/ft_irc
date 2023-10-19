@@ -42,7 +42,7 @@ void joinControl(int &fd, Server *server, std::vector<std::string> split)
 
 void partControl(int &fd, Server *server, std::vector<std::string> split)
 {
-	if (split.size() > 2)
+	if (split.size() == 2)
 	{
 		if (split[1][0] == '#')
 			Command::part(fd, server, split[1]);
@@ -50,7 +50,7 @@ void partControl(int &fd, Server *server, std::vector<std::string> split)
 			numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, server->findUser(fd));
 	}
 	else
-		return ;
+		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, server->findUser(fd));
 }
 
 void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
@@ -122,13 +122,14 @@ void topicControl(int &fd, Server *server, std::vector<std::string> split)
 
 void quitControl(int &fd, Server *server, std::vector<std::string> split)
 {
-	if (split.size() == 2)
+	if (split.size() == 2 && split[1][0] == ':')
 	{
 		Command::quit(fd, server, split);
 	}
 	else
-		return ; //add if commnad quit without message
-
+	{
+		
+	}
 }
 
 void noticeControl(int &fd, Server *server, std::vector<std::string> split)
@@ -234,7 +235,7 @@ void cmdall(int &fd, Server *server, std::string msg)
 	else if (split[0] == "KICK")
 		kickcontrol(fd, server, split);
 	else
-		return ;
+		numeric::sendNumeric(ERR_UNKNOWNCOMMAND(split[0]), server, server->findUser(fd));
 }
 
 bool	checkEnter(std::string msg)
@@ -261,16 +262,6 @@ void	Execute::execute(int fd, Server *server, std::string msg)
 	if (auth == false)
 	{
 		checkAuth(user);
-		if (user->isAuth() == true)
-		{
-		std::string nickname = user->getNickname();
-		std::string username = user->getUsername();
-		std::string hostname = user->getHostname();
-		std::string createtime = utils::getTime();
-		numeric::sendNumeric(RPL_WELCOME(nickname, username, hostname), server, user);
-		numeric::sendNumeric(RPL_YOURSERVICE(nickname, hostname), server, user);
-		numeric::sendNumeric(RPL_CREATED(nickname,createtime), server, user);
-		}
 	}
 	if (user->isAuth() != true && (cmd != "NICK" && cmd != "USER" && cmd != "PASS" && cmd != "CAP"))
 	{
