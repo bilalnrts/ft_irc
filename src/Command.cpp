@@ -146,6 +146,26 @@ namespace Command
 
 	void privMsg(int fd, Server *server, std::vector<std::string> split)
 	{
+
+		if (split[1][0] == '#') {
+			//channel
+			Channel *channel = server->getChannel(split[1]);
+			std::vector<User *> users = channel->getUserList();
+			for (std::vector<User *>::iterator it = users.begin(); it != users.end(); it++) {
+				User *user = server->findUser((*it)->getUserFd());
+				int userFd = user->getUserFd();
+				if (userFd != fd)
+					server->sender(userFd, utils::getPrefix(user) + " PRIVMSG " + split[1] + " " + split[2]);
+			}
+		} else
+		{
+			User *user = server->findUser(split[1]);
+			int userFd = user->getUserFd();
+			if (userFd != fd)
+				server->sender(userFd, utils::getPrefix(user) + " PRIVMSG " + split[1] + " " + split[2]);
+		}
+
+/*
 			User *user = server->findUser(fd);
 			Channel *channel = server->getChannel(split[1]);
 			std::string msg = "";
@@ -166,7 +186,7 @@ namespace Command
 				int fd2 = (*it)->getUserFd();
 				if (fd != fd2)
 					server->sender(fd2, utils::getPrefix(user) + " PRIVMSG " + channelName + " :" + msg);
-			}
+			} */
 	}
 
 	void topic(int fd, Server *server, std::vector<std::string> split)
