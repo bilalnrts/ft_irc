@@ -25,6 +25,8 @@ namespace Command
 					server->sender(toSend, utils::getPrefix(user) + " NICK " + nick);
 			}
 		}
+		if (utils::checkAuth(user))
+			utils::welcome(user, server);
 	}
 
 	void	pass(int fd, Server *server, std::string msg)
@@ -35,6 +37,8 @@ namespace Command
 		if (check::pass(spl[0], spl[1], spl.size(), user, server)) {
 			user->setAuths("PASS", true);
 		}
+		if (utils::checkAuth(user))
+			utils::welcome(user, server);
 	}
 
 
@@ -51,13 +55,8 @@ namespace Command
 			user->setHostname(splWithSpace[3]);
 			user->setAuths("USER", true);
 		}
-		std::string nickname = user->getNickname();
-		std::string username = user->getUsername();
-		std::string hostname = user->getHostname();
-		std::cout << "Nick : " + nickname << std::endl;
-		std::cout << "Real : " + user->getRealname() << std::endl;
-		std::cout << "Host : " + user->getHostname() << std::endl;
-		std::cout << "Mode : " << user->getMode() << std::endl;
+		if (utils::checkAuth(user))
+			utils::welcome(user, server);
 	}
 
 	void	cap(int fd, Server *server, std::string msg)
@@ -227,7 +226,7 @@ namespace Command
 
 	void notice (int fd , Server *server, std::vector<std::string> split)
 	{
-		
+
 		std::string channelName = split[1];
 		std::string message = split[2];
 
