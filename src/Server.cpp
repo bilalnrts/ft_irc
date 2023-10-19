@@ -50,17 +50,23 @@ void	Server::run()
 			acceptClient(fds);
 		}
 		for (int i = 1; i < MAX_CLIENTS; i++) {
-			if (fds[i].fd != -1 && (fds[i].revents == POLLIN))
-				handleClient(fds, i);
-			else if (fds[i].fd != -1 && (fds[i].revents == POLLHUP )) {
-				close(fds[i].fd);
-				User *user = this->findUser(fds[i].fd);
-				if (user) {
-					exec.execute(fds[i].fd, this, "JOIN #0");
-					this->removeUser(this->findUser(fds[i].fd));
-					delete user;
+			if (fds[i].fd != -1) {
+				if (fds[i].revents & (POLLIN | POLLHUP | POLLERR)) {
+					if (fds[i].revents & POLLIN) {
+						handleClient(fds, i);
+					}
+					if (fds[i].revents & (POLLHUP | POLLERR)) {
+						close(fds[i].fd);
+						User *user = this->findUser(fds[i].fd);
+						if (user) {
+							exec.execute(fds[i].fd, this, "JOIN #0");
+							this->removeUser(this->findUser(fds[i].fd));
+							delete user;
+						}
+						fds[i].fd = -1;
+					}
+					fds[i].revents = 0;
 				}
-				fds[i].fd = -1;
 			}
 		}
 	}
@@ -201,6 +207,7 @@ void	Server::removeUser(User *user)
 	std::vector<User *>::iterator it = std::find(userList.begin(), userList.end(), user);
 	if (it != userList.end()) {
 		userList.erase(it);
+		close(user->getUserFd());
 	}
 }
 
