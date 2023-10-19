@@ -103,12 +103,14 @@ void	Server::handleClient(struct pollfd fds[], int index)
 
 	memset(buffer, 0, sizeof(buffer));
 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
-	if (bytesRead <= 0) {
-		perror("Error !\nrecv didn't work as excepted!\n");
-	}
-	else {
-		std::string msg = utils::trimBuffer(buffer);
-		exec.execute(fds[index].fd, this, msg);
+	if (!(fds[index].revents & (POLLERR | POLLHUP))) {
+		if (bytesRead <= 0) {
+			perror("Error !\nrecv didn't work as excepted!\n");
+		}
+		else {
+			std::string msg = utils::trimBuffer(buffer);
+			exec.execute(fds[index].fd, this, msg);
+		}
 	}
 }
 
