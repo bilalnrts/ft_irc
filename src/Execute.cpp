@@ -2,16 +2,6 @@
 #include "../inc/Command.hpp"
 #include "../inc/User.hpp"
 
-
-bool	checkAuth(User *user)
-{
-	if (!user->getAuths("PASS") || !user->getAuths("NICK") || !user->getAuths("USER")) {
-		return (false);
-	}
-	user->setAuth();
-	return (true);
-}
-
 void joinControl(int &fd, Server *server, std::vector<std::string> split)
 {
 
@@ -58,7 +48,7 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 	User *user = server->findUser(fd);
 	std::string nickName = user->getNickname();
 	Channel *channel = server->getChannel(split[1]);
-	
+
 	if (channel == NULL)
 	{
 		numeric::sendNumeric(ERR_NOSUCHNICK(split[1]), server, user);
@@ -149,7 +139,7 @@ void quitControl(int &fd, Server *server, std::vector<std::string> split)
 	}
 	else
 	{
-		
+
 	}
 }
 
@@ -161,11 +151,11 @@ void noticeControl(int &fd, Server *server, std::vector<std::string> split)
 	if (split[1][0] == '#' && split[2] != "") {
 		int size = split.size();
 		if (split.size() == 3)
-		{	
+		{
 			Command::notice(fd, server, split);
 		}
 		else if (size > 3)
-		{ 
+		{
 				std::string message;
 				for (int i = 2; i < size; i++) {
 					message += split[i];
@@ -192,7 +182,7 @@ void noticeControl(int &fd, Server *server, std::vector<std::string> split)
 
 void kickcontrol(int &fd, Server *server, std::vector<std::string> split)
 {
-	// command = > KICK #channel user 
+	// command = > KICK #channel user
 	if (split[1][0] == '#' && split[2] != "") {
 		int size = split.size();
 		if (size == 3)
@@ -224,7 +214,7 @@ void kickcontrol(int &fd, Server *server, std::vector<std::string> split)
 	else
 	{
 		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, server->findUser(fd));
-	}	
+	}
 }
 
 
@@ -278,22 +268,7 @@ void	Execute::execute(int fd, Server *server, std::string msg)
 	}
 	User *user = server->findUser(fd);
 	std::string cmd = msg.substr(0, msg.find(' '));
-	bool auth = user->isAuth();
 
-	if (auth == false)
-	{
-		checkAuth(user);
-			if (user->isAuth() == true)
-			{
-			std::string nickname = user->getNickname();
-			std::string username = user->getUsername();
-			std::string hostname = user->getHostname();
-			std::string createtime = utils::getTime();
-			numeric::sendNumeric(RPL_WELCOME(nickname, username, hostname), server, user);
-			numeric::sendNumeric(RPL_YOURSERVICE(nickname, hostname), server, user);
-			numeric::sendNumeric(RPL_CREATED(nickname,createtime), server, user);
-			}
-	}
 	if (user->isAuth() != true && (cmd != "NICK" && cmd != "USER" && cmd != "PASS" && cmd != "CAP"))
 	{
 		server->sender(fd, "Error !\nYou didn't verify your identity yet !");
