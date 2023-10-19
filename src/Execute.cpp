@@ -57,7 +57,13 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 {
 	User *user = server->findUser(fd);
 	std::string nickName = user->getNickname();
-
+	Channel *channel = server->getChannel(split[1]);
+	
+	if (channel == NULL)
+	{
+		numeric::sendNumeric(ERR_NOSUCHNICK(split[1]), server, user);
+		return ;
+	}
 	if (split[1][0] == '#' && split[2] != "" && split[2][0] == ':') {
     int size = split.size();
 	split[2].erase(0, 1);
@@ -81,6 +87,21 @@ void privMsgControl(int &fd, Server *server, std::vector<std::string> split)
 	else if ((split[1][0] == '#' && split[2] != "") || split[2][0] != ':')
 	{
 		numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
+	}
+	else if (split[1][0] != '#')
+	{
+		User *user2 = server->findUser(split[1]);
+		if (user2 == NULL)
+		{
+			numeric::sendNumeric(ERR_NOSUCHNICK(split[1]), server, user);
+			return ;
+		}
+		else
+		{
+			int fd2 = user2->getUserFd();
+			if (fd != fd2)
+				server->sender(fd2, utils::getPrefix(user) + " PRIVMSG " + split[1] + " :" + split[2]);
+		}
 	}
 	else
 		return ;
