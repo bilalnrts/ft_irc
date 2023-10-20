@@ -125,11 +125,12 @@ namespace Command
 		User *user = server->findUser(fd);
 		Channel *channel = server->getChannel(msg);
 
-		if (user == channel->getOwner())
-			// must be change owner
+		if (user == channel->getOwner()) {
+			channel->changeOwner(server);
+		}
 		channel->removeUser(user);
 		user->removeChannel(channel);
-		// must be a remove operator
+		channel->removeEditor(user);
 		std::vector<User*> users = channel->getUserList();
 		for (std::vector<User*>::iterator it = users.begin(); it != users.end(); it++)
 		{
@@ -143,10 +144,11 @@ namespace Command
 			return ;
 		}
 	}
-
+// notice
+// quit
+// part
 	void privMsg(int fd, Server *server, std::vector<std::string> split)
 	{
-
 		if (split[1][0] == '#') {
 			//channel
 			Channel *channel = server->getChannel(split[1]);
@@ -155,38 +157,15 @@ namespace Command
 				User *user = server->findUser((*it)->getUserFd());
 				int userFd = user->getUserFd();
 				if (userFd != fd)
-					server->sender(userFd, utils::getPrefix(user) + " PRIVMSG " + split[1] + " " + split[2]);
+					server->sender(userFd, utils::getPrefix(user) + " PRIVMSG " + split[1] + " : " + split[2]);
 			}
 		} else
 		{
 			User *user = server->findUser(split[1]);
 			int userFd = user->getUserFd();
 			if (userFd != fd)
-				server->sender(userFd, utils::getPrefix(user) + " PRIVMSG " + split[1] + " " + split[2]);
+				server->sender(userFd, utils::getPrefix(server->findUser(fd)) + " PRIVMSG " + split[1] + " : " + split[2]);
 		}
-
-/*
-			User *user = server->findUser(fd);
-			Channel *channel = server->getChannel(split[1]);
-			std::string msg = "";
-			std::string channelName = channel->getName();
-
-			if (split.size() == 2)
-				msg = split[1];
-			else
-				msg = split[2];
-			if (channel == NULL)
-			{
-				numeric::sendNumeric(ERR_NOSUCHNICK(channelName), server, user);
-				return ;
-			}
-			std::vector<User *> users = channel->getUserList();
-			for (std::vector<User *>::iterator it = users.begin(); it != users.end(); it++)
-			{
-				int fd2 = (*it)->getUserFd();
-				if (fd != fd2)
-					server->sender(fd2, utils::getPrefix(user) + " PRIVMSG " + channelName + " :" + msg);
-			} */
 	}
 
 	void topic(int fd, Server *server, std::vector<std::string> split)
@@ -196,8 +175,6 @@ namespace Command
 		{
 			std::string channelName = split[1];
 			Channel *channel = server->getChannel(channelName);
-			if (split[2][0] == ':')
-				split[2].erase(0, 1);
 			std::string topic = split[2];
 			server->sender(fd, utils::getPrefix(user) + " TOPIC " + channelName + " :" + topic);
 			 std::vector<User *> userList = channel->getUserList();
@@ -207,6 +184,7 @@ namespace Command
 				if (toSend != fd)
 					server->sender(toSend, utils::getPrefix(user) + " TOPIC " + channelName + " :" + topic);
 			}
+			channel->setTopic(topic);
 		}
 		if (split.size() == 2)
 		{
@@ -217,10 +195,6 @@ namespace Command
 			else
 				numeric::sendNumeric(RPL_NOTOPIC(user->getNickname(), channelName), server, user);
 		}
-		if (!&topic)
-			numeric::sendNumeric(ERR_NEEDMOREPARAMS(split[0]), server, user);
-		else
-			return ;
 	}
 
 	void quit (int fd, Server *server, std::vector<std::string> split)
@@ -246,24 +220,14 @@ namespace Command
 
 	void notice (int fd , Server *server, std::vector<std::string> split)
 	{
-
-		std::string channelName = split[1];
-		std::string message = split[2];
-
-		// fd ile alakalı bir şey yapılacak mı? Kontrol
-
-		Channel *channel = server->getChannel(channelName);
 		std::vector<Channel *> channelList = server->getChannelList();
-		std::vector<User *> users = channel->getUserList();
-		for (std::vector<Channel *>::iterator it2 = channelList.begin(); it2 != channelList.end(); it2++)
-		{
-			std::vector<User *>::iterator it = users.begin();
-			for (; it != users.end(); it++)
-			{
-				if ((*it)->getUserFd() != fd)
-				{
-					std::string nickName = (*it)->getNickname();
-					server->sender(fd, utils::getPrefix(server->findUser(fd)) + " NOTICE " + channelName + " :" + message);
+		int	targetFd = server->findUser(split[1])->getUserFd();
+
+		for (std::vector<Channel *>::iterator it = channelList.begin(); it != channelList.end(); it++) {
+			std::vector<User *> userList = (*it)->getUserList();
+			for (std::vector<User *>::iterator it2 = userList.begin(); it2 != userList.end(); it2++) {
+				if ((*it2)->getUserFd() == fd) {
+					server->sender(targetFd, utils::getPrefix(server->findUser(fd)) + " NOTICE " + (*it)->getName() + " :" + split[2]);
 				}
 			}
 		}
