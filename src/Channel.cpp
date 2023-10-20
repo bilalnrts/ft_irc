@@ -97,3 +97,11 @@ void Channel::changeOwner(Server *server)
 	}
 }
 
+bool	Channel::isEditorInChannel(User *user)
+{
+	std::vector<User *>::iterator it = std::find(editorList.begin(), editorList.end(), user);
+	if (it != editorList.end()) {
+		return (true);
+	}
+	return (false);
+}

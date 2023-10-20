@@ -37,6 +37,7 @@ class Channel
 		User	*getOwner() const;
 		User	*getUser(User *user);
 		User	*getEditor(User *user);
+		bool	isEditorInChannel(User *user);
 };
 
 #endif
